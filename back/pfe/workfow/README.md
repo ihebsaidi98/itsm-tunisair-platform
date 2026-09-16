@@ -39,6 +39,9 @@ the Tunisian national airline.
 - Python 3
 - MySQL
 
+<img width="2500" height="1592" alt="classdiagram" src="https://github.com/user-attachments/assets/c9deb076-e73f-464c-b50b-326e5e996a36" />
+
+
 ### Backend
 
     cd backend
@@ -50,6 +53,9 @@ API runs at `http://localhost:8080` — Swagger UI at `/swagger-ui.html`.
 
     cd rag-ai
     pip install -r requirements.txt
+
+    <img width="1536" height="932" alt="chatbot" src="https://github.com/user-attachments/assets/706a0a49-f336-4651-b148-e3920f824575" />
+
 
 ### Frontend
 
@@ -81,5 +87,8 @@ Then open `http://localhost:4200` in your browser.
 
 <img width="1342" height="636" alt="7" src="https://github.com/user-attachments/assets/34950827-e457-4930-9cc1-1ff55d6d3ded" />
 <img width="1122" height="642" alt="incident1" src="https://github.com/user-attachments/assets/d5c53d05-f2f4-48aa-82ce-d724a8794a0a" />
+
+<img width="652" height="640" alt="3" src="https://github.com/user-attachments/assets/a34981c4-6fd1-40c1-a8d6-207396a2e7b1" />
+<img width="424" height="533" alt="token" src="https://github.com/user-attachments/assets/c5564c48-a8fb-4617-a756-36496702f47b" />
 
 
