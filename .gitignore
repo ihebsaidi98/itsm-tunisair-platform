@@ -1,0 +1,11 @@
+target/
+node_modules/
+dist/
+.angular/
+.idea/
+.vscode/
+*.class
+.env
+__pycache__/
+*.pyc
+venv/
