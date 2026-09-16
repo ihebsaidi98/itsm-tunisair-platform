@@ -75,7 +75,7 @@ Then open `http://localhost:4200` in your browser.
 ---
 
 *Developed during a software engineering internship at Tunisair (Tunisian national airline).*
-```
+
 
 <img width="429" height="579" alt="User_Incident_Change" src="https://github.com/user-attachments/assets/cfccbb27-3aff-4c76-b41f-8046c356411e" />
 <img width="771" height="641" alt="uses" src="https://github.com/user-attachments/assets/03e02c42-b07e-4fe5-a4d1-371b05909137" />
