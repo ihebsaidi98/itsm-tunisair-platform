@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../out-tsc/app",
+    "types": ["node"],
+    "lib": ["es2018", "dom"] // Add this line
+  },
+  "files": ["main.ts", "polyfills.ts"],
+  "include": ["**/*.d.ts"]
+}

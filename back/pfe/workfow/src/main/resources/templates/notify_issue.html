@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification de Problème</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+        .issue-details {
+            margin: 20px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        .action-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .action-link a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #e63946;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Notification de Problème</h1>
+    </div>
+    <p class="greeting" >Bonjour</p>
+    <div class="issue-details">
+        <p>Nous voulions vous informer d'un problème qui nécessite votre attention :</p>
+        <p>Veuillez examiner les détails et prendre les mesures nécessaires dès que possible.</p>
+    </div>
+    <div class="action-link">
+        <a th:href="${link}" target="_blank">Examiner le Problème</a>
+    </div>
+</div>
+</body>
+</html>

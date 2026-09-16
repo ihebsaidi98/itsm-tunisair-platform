@@ -1,0 +1,478 @@
+<div class="content-wrapper container-xxl p-0">
+    <div class="content-body">
+
+        <!-- Kitchen Sink Datatables -->
+        <section id="ngx-datatable-kitchen-sink" style="background: white; padding: 20px; border-radius: 10px">
+            <h4 class="card-title">Mises à jour</h4>
+            <div class="row">
+                <div class="col-12 mb-50">
+                    <button (click)="toggleModal()" class="btn btn-primary ml-1" rippleEffect>
+                        <i class="mr-0 mr-sm-1" data-feather="plus"></i
+                        ><span class="d-none d-sm-inline-block">Ajouter une nouvelle mise à jour</span>
+                    </button>
+
+                    <a [data]="exportCSVData" class="btn btn-outline-secondary float-right mr-1" csvLink
+                       rippleEffect
+                    >Exporter CSV</a
+                    >
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="d-flex justify-content-between align-items-center m-1">
+                        <label class="d-flex align-items-center"
+                        >Afficher
+                            <select [(ngModel)]="basicSelectedOption" class="form-control mx-25">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            entrées</label
+                        >
+                    </div>
+                </div>
+                <div class="col-md-6 col-12 d-flex justify-content-md-end">
+                    <div class="d-flex align-items-center justify-content-end pr-1 pb-1 pl-1 pl-md-0 pb-md-0">
+                        <label class="d-flex align-items-center"
+                        >Rechercher<input
+                                (keyup)="filterUpdate($event)"
+                                (search)="filterUpdate($event)"
+                                class="form-control ml-25"
+                                placeholder="Rechercher"
+                                type="search"
+                        /></label>
+                    </div>
+                </div>
+            </div>
+            <ngx-datatable
+                #tableRowDetails
+                (activate)="onActivate($event)"
+                (select)="onSelect($event)"
+                [columnMode]="ColumnMode.force"
+                [footerHeight]="50"
+                [headerHeight]="40"
+                [limit]="basicSelectedOption"
+                [rowHeight]="58"
+                [rows]="ChangementRows"
+                [scrollbarH]="true"
+                class="bootstrap core-bootstrap"
+            >
+                <ngx-datatable-row-detail [rowHeight]="50">
+                    <ng-template let-expanded="expanded" let-row="row" ngx-datatable-row-detail-template>
+                        <div class="ml-75 pl-5 pt-75">
+                            <div>
+                                <div><strong>Commentaires </strong>{{ row.commentaire }} <strong>,
+                                    Motif </strong>{{ row.motif }}
+                                </div>
+                                <div><strong>Date de soumission : </strong>{{ formatDate(row.dateCreation) }}</div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </ngx-datatable-row-detail>
+                <ngx-datatable-column
+                        [canAutoResize]="false"
+                        [draggable]="false"
+                        [resizeable]="false"
+                        [sortable]="false"
+                        [width]="50"
+                >
+                    <ng-template let-expanded="expanded" let-row="row" ngx-datatable-cell-template>
+                        <a
+                                (click)="rowDetailsToggleExpand(row)"
+                                [class.datatable-icon-down]="expanded"
+                                [class.datatable-icon-right]="!expanded"
+                                href="javascript:void(0)"
+                                title="Développer/Réduire la ligne"
+                        >
+                        </a>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="170" name="Responsable" prop="responsable">
+                    <ng-template let-user="value" ngx-datatable-cell-template>
+                        <div class="cell-line-height">
+                            <p class="font-medium-1 line-height-1 mb-0"> {{ user.firstname }} {{ user.lastname }}</p>
+                            <span class="text-muted font-small-2">  {{ user.email }}</span>
+                        </div>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Description" prop="description">
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Affecté à ">
+                    <ng-template let-expanded="expanded" let-row="row" ngx-datatable-cell-template>
+                        <p *ngIf="row.incident">{{ row.incident.description }}</p>
+                        <p *ngIf="row.probleme">{{ row.probleme.description }}</p>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Date de début" prop="dateDebutPrevu">
+                    <ng-template let-date="value" ngx-datatable-cell-template>
+                        {{ formatDate(date) }}
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Date de fin" prop="dateFinPrevu">
+                    <ng-template let-date="value" ngx-datatable-cell-template>
+                        {{ formatDate(date) }}
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Statut" prop="statutChangement">
+                    <ng-template let-status="value" ngx-datatable-cell-template>
+                        <div
+                                [ngClass]="{
+                  'badge-light-info': status == 'EN_ATTENTE_EVALUATION',
+                  'badge-light-primary': status == 'EN_COURS',
+                  'badge-light-danger': status == 'DEMANDE',
+                  'badge-light-warning': status == 'PLANIFICATION',
+                  'badge-light-success': status == 'TERMINE'
+                }"
+                                class="badge badge-pill"
+                        >
+                            {{
+                                status == "TERMINE" ? 'TERMINE' : status == "EN_ATTENTE_EVALUATION" ?
+                                    'EN_ATTENTE_EVALUATION' : status == "EN_COURS"
+                                        ? 'EN_COURS'
+                                        : status == "DEMANDE"
+                                            ? 'DEMANDE'
+                                            : status == "PLANIFICATION"
+                                            && 'PLANIFICATION'
+                            }}
+                        </div>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="250" name="Fichier ( Cliquez pour télécharger ) " prop="filename">
+                    <ng-template let-filename="value" ngx-datatable-cell-template>
+                        <a (click)="downloadFile(filename)">{{ filename }}</a>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [sortable]="false" [width]="100" name="Actions" prop="id">
+                    <ng-template let-id="value" ngx-datatable-cell-template>
+                        <div class="d-flex align-items-center">
+                            <div container="body" ngbDropdown>
+                                <a
+                                        aria-expanded="false"
+                                        aria-haspopup="true"
+                                        class="hide-arrow"
+                                        data-toggle="dropdown"
+                                        href="javascript:void(0);"
+                                        id="dropdownBrowserState"
+                                        ngbDropdownToggle
+                                >
+                                    <i class="text-primary cursor-pointer mr-50" data-feather="more-vertical"></i>
+                                </a>
+                                <div aria-labelledby="dropdownBrowserState" class="dropdown-menu-right"
+                                     ngbDropdownMenu>
+                                    <a class="d-flex align-items-center" href="javascript:void(0)" ngbDropdownItem
+                                    ><i class="mr-50" data-feather="file-text"></i> Détails</a
+                                    >
+                                    <a (click)="deleteChangement(id)" class="d-flex align-items-center" ngbDropdownItem
+                                    ><i class="mr-50" data-feather="trash-2"></i> Supprimer</a
+                                    >
+                                </div>
+                            </div>
+                            <a (click)="openEditModal(id)" class="mr-50">
+                                <i class="text-primary cursor-pointer" data-feather="edit"></i>
+                            </a>
+                            <a (click)="ToggleaskAi(id)">
+                                <i class="text-primary cursor-pointer" data-feather="help-circle"></i>
+                            </a>
+                        </div>
+                    </ng-template>
+                </ngx-datatable-column>
+            </ngx-datatable>
+        </section>
+        <!--/ Kitchen Sink Datatables -->
+
+    </div>
+</div>
+
+<div *ngIf="showModal || showAiModal" class="modal-backdrop fade show"></div>
+<div *ngIf="showModal" [ngClass]="{'show': showModal}" aria-hidden="true" aria-labelledby="addChangementModalLabel"
+     class="modal" role="dialog"
+     style="display: block;" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"
+                    id="addChangementModalLabel"> {{ isEditMode ? 'Modifier Changement' : 'Ajouter Nouveau Changement' }}</h5>
+                <button (click)="toggleModal()" aria-label="Fermer" class="close" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form (ngSubmit)="isEditMode ? editChangement() : addChangement()" [formGroup]="ChangementForm">
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <input [ngClass]="{'is-invalid': formSubmitted && ChangementForm.controls['description'].invalid}"
+                                       class="form-control" formControlName="description"
+                                       id="description"
+                                       required type="text"/>
+                                <div *ngIf="formSubmitted && ChangementForm.controls['description'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="commentaire">Commentaire</label>
+                                <textarea
+                                        [ngClass]="{'is-invalid': formSubmitted && ChangementForm.controls['commentaire'].invalid}"
+                                        class="form-control"
+                                        formControlName="commentaire" id="commentaire" required></textarea>
+                                <div *ngIf="formSubmitted && ChangementForm.controls['commentaire'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="categorie">Catégorie</label>
+                                <textarea
+                                        [ngClass]="{'is-invalid': formSubmitted && ChangementForm.controls['categorie'].invalid}"
+                                        class="form-control"
+                                        formControlName="categorie" id="categorie" required></textarea>
+                                <div *ngIf="formSubmitted && ChangementForm.controls['categorie'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="dateDebutPrevu">Date de début prévue</label>
+                                <input [ngClass]="{'is-invalid': formSubmitted && ChangementForm.controls['dateDebutPrevu'].invalid}"
+                                       class="form-control"
+                                       formControlName="dateDebutPrevu"
+                                       id="dateDebutPrevu" required type="date"/>
+                                <div *ngIf="formSubmitted && ChangementForm.controls['dateDebutPrevu'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="dateFinPrevu">Date de fin prévue</label>
+                                <input [ngClass]="{'is-invalid': formSubmitted && ChangementForm.controls['dateFinPrevu'].invalid}"
+                                       class="form-control"
+                                       formControlName="dateFinPrevu"
+                                       id="dateFinPrevu" required type="date"/>
+                                <div *ngIf="formSubmitted && ChangementForm.controls['dateFinPrevu'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="priorite">Priorité</label>
+                                <select [ngClass]="{'is-invalid': formSubmitted && ChangementForm.controls['priorite'].invalid}"
+                                        class="form-control" formControlName="priorite" id="priorite">
+                                    <option value="FAIBLE">Faible</option>
+                                    <option value="MOYENNE">Moyenne</option>
+                                    <option value="HAUTE">Haute</option>
+                                    <option value="URGENTE">Urgente</option>
+                                </select>
+                                <div *ngIf="formSubmitted && ChangementForm.controls['priorite'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="statutChangement">Statut</label>
+                                <select [ngClass]="{'is-invalid': formSubmitted && ChangementForm.controls['statutChangement'].invalid}"
+                                        class="form-control" formControlName="statutChangement" id="statutChangement">
+                                    <option *ngIf="isEditMode === true" value="TERMINE">Terminé</option>
+                                    <option value="DEMANDE">Demande</option>
+                                    <option value="EN_ATTENTE_EVALUATION">En attente d'évaluation</option>
+                                    <option value="PLANIFICATION">Planification</option>
+                                    <option value="EN_COURS">En cours de résolution</option>
+                                </select>
+                                <div *ngIf="formSubmitted && ChangementForm.controls['statutChangement'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="motif">Motif</label>
+                                <input [ngClass]="{'is-invalid': formSubmitted && ChangementForm.controls['motif'].invalid}"
+                                       class="form-control"
+                                       formControlName="motif"
+                                       id="motif" required type="text">
+                                <div *ngIf="formSubmitted && ChangementForm.controls['motif'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="etapesMiseEnOeuvre">Étapes de mise en œuvre</label>
+                                <textarea
+                                        [ngClass]="{'is-invalid': formSubmitted && ChangementForm.controls['etapesMiseEnOeuvre'].invalid}"
+                                        class="form-control"
+                                        formControlName="etapesMiseEnOeuvre" id="etapesMiseEnOeuvre"
+                                        required></textarea>
+                                <div *ngIf="formSubmitted && ChangementForm.controls['etapesMiseEnOeuvre'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="actionsCorrectives">Actions correctives</label>
+                                <textarea
+                                        [ngClass]="{'is-invalid': formSubmitted && ChangementForm.controls['actionsCorrectives'].invalid}"
+                                        class="form-control"
+                                        formControlName="actionsCorrectives" id="actionsCorrectives"
+                                        required></textarea>
+                                <div *ngIf="formSubmitted && ChangementForm.controls['actionsCorrectives'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="evaluationRisques">Évaluation des risques</label>
+                                <textarea
+                                        [ngClass]="{'is-invalid': formSubmitted && ChangementForm.controls['evaluationRisques'].invalid}"
+                                        class="form-control"
+                                        formControlName="evaluationRisques" id="evaluationRisques" required></textarea>
+                                <div *ngIf="formSubmitted && ChangementForm.controls['evaluationRisques'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="impactUtilisateurs">Impact sur les utilisateurs</label>
+                                <textarea
+                                        [ngClass]="{'is-invalid': formSubmitted && ChangementForm.controls['impactUtilisateurs'].invalid}"
+                                        class="form-control"
+                                        formControlName="impactUtilisateurs" id="impactUtilisateurs"
+                                        required></textarea>
+                                <div *ngIf="formSubmitted && ChangementForm.controls['impactUtilisateurs'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="affectedIssues">Problèmes affectés</label>
+                                <select [ngClass]="{'is-invalid': formSubmitted && ChangementForm.controls['affectedIssues'].invalid}"
+                                        class="form-control" formControlName="affectedIssues" id="affectedIssues">
+                                    <option *ngFor="let issue of AffectedIssues"
+                                            value="{{AffectedIssues.indexOf(issue)}}">{{ issue.description }}
+                                    </option>
+                                </select>
+                                <div *ngIf="formSubmitted && ChangementForm.controls['affectedIssues'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Fichier</label>
+                                <div class="custom-file">
+                                    <input (change)="onFileSelected($event)" class="custom-file-input" id="customFile"
+                                           type="file"/>
+                                    <label class="custom-file-label" for="customFile">Choisir un fichier</label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <button class="btn btn-primary"
+                            type="submit">{{ isEditMode ? 'Modifier Changement' : 'Ajouter Changement' }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div *ngIf="showAiModal" [ngClass]="{'show': showAiModal}" aria-hidden="true" aria-labelledby="AskAI"
+     class="modal" role="dialog"
+     style="display: block;" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"
+                    id="showAiModel">Demander à l'IA</h5>
+                <button (click)="ToggleAiModal()" aria-label="Fermer" class="close" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h5 *ngIf="!hasPDFfile">Ce changement n'a pas de fichier PDF ! </h5>
+                <section *ngIf="hasPDFfile" class="chat-app-window">
+                    <div class="start-chat-area d-none">
+                        <div class="mb-1 start-chat-icon">
+                            <i data-feather="message-square"></i>
+                        </div>
+                    </div>
+                    <div #scrollMe [perfectScrollbar] class="user-chats" [scrollTop]="scrolltop">
+                        <div class="chats">
+                            <div class="chats">
+                                <div
+                                        class="chat"
+                                        *ngFor="let chatRef of chats.chat"
+                                        [ngClass]="{ 'chat-left': 0 === chatRef.userId }"
+                                >
+                                    <div class="chat-avatar">
+            <span class="avatar box-shadow-1 cursor-pointer">
+              <img
+                      *ngIf="chatRef.userId !== 0; else alternateAvatar"
+                      src="../assets/images/ai.png"
+                      alt="avatar"
+                      height="36"
+                      width="36"
+              />
+              <ng-template #alternateAvatar>
+                <img src="../assets/images/ai.png" alt="avatar" height="36" width="36" />
+              </ng-template>
+            </span>
+                                    </div>
+                                    <div class="chat-body">
+                                        <div class="chat-content">
+                                            <p>{{ chatRef.message }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <form class="chat-app-form" action="javascript:void(0);">
+                        <div class="input-group input-group-merge mr-1 form-send-message">
+                            <input
+                                    type="text"
+                                    class="form-control message"
+                                    placeholder="Tapez votre message ou utilisez la reconnaissance vocale"
+                                    [(ngModel)]="chatMessage"
+                                    name="chat-message"
+                                    (keydown.enter)="updateChat()"
+                            />
+                        </div>
+                        <button type="button" class="btn btn-primary send" (click)="updateChat()" rippleEffect>
+                            <i data-feather="send" class="d-lg-none"></i>
+                            <span class="d-none d-lg-block">Envoyer</span>
+                        </button>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,70 @@
+<div class="stats-page" style="background: white">
+    <h2>Statistiques : Problèmes et Incidents</h2>
+
+    <!-- Comptes Généraux -->
+    <div class="stats-section">
+        <h3>Aperçu</h3>
+        <div class="stats-cards">
+            <div class="card">
+                <h4>Total des Problèmes</h4>
+                <p>{{ totalProblems }}</p>
+            </div>
+            <div class="card">
+                <h4>Total des Incidents</h4>
+                <p>{{ totalIncidents }}</p>
+            </div>
+            <div class="card">
+                <h4>Problèmes Archivés</h4>
+                <p>{{ archivedProblems }}</p>
+            </div>
+            <div class="card">
+                <h4>Incidents Archivés</h4>
+                <p>{{ archivedIncidents }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="stats-section">
+        <h3>Visualisations</h3>
+        <div class="charts">
+            <div>
+                <h4>Problèmes par Statut</h4>
+                <canvas id="problemsStatusChart"></canvas>
+            </div>
+            <div style="width: 100%; max-width: 600px; height: 400px;">
+                <h4>Incidents par Priorité</h4>
+                <canvas id="incidentsPriorityChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-section">
+        <h3>Changement</h3>
+        <div class="stats-cards">
+            <div class="card">
+                <h4>Total des Changements</h4>
+                <p>{{TotalChangement}}</p>
+            </div>
+            <div class="card">
+                <h4>Changements Acceptés</h4>
+                <p>{{AccepetedChangement}}</p>
+            </div>
+            <div class="card">
+                <h4>Changements de Haute et Urgente Priorité</h4>
+                <p>{{HighPriotiyChangement}}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-section">
+        <div class="charts">
+            <div>
+                <canvas id="changesPriorityChart"></canvas>
+            </div>
+            <div>
+                <canvas id="changesStatsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>

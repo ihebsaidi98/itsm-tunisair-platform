@@ -1,0 +1,267 @@
+<div class="content-wrapper container-xxl p-0">
+    <div class="content-body">
+
+        <!-- Kitchen Sink Datatables -->
+        <section id="ngx-datatable-kitchen-sink" style="background: white; padding: 20px; border-radius: 10px">
+            <h4 class="card-title">Utilisateurs</h4>
+            <div class="row">
+                <div class="col-12 mb-50">
+                    <button (click)="toggleModal()" class="btn btn-primary ml-1" rippleEffect>
+                        <i class="mr-0 mr-sm-1" data-feather="plus"></i
+                        ><span class="d-none d-sm-inline-block">Ajouter un nouvel utilisateur</span>
+                    </button>
+
+                    <a [data]="exportCSVData" class="btn btn-outline-secondary float-right mr-1" csvLink
+                       rippleEffect
+                    >Exporter CSV</a
+                    >
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="d-flex justify-content-between align-items-center m-1">
+                        <label class="d-flex align-items-center"
+                        >Afficher
+                            <select [(ngModel)]="basicSelectedOption" class="form-control mx-25">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            entrées</label
+                        >
+                    </div>
+                </div>
+                <div class="col-md-6 col-12 d-flex justify-content-md-end">
+                    <div class="d-flex align-items-center justify-content-end pr-1 pb-1 pl-1 pl-md-0 pb-md-0">
+                        <label class="d-flex align-items-center"
+                        >Rechercher<input
+                                (keyup)="filterUpdate($event)"
+                                (search)="filterUpdate($event)"
+                                class="form-control ml-25"
+                                placeholder="Rechercher"
+                                type="search"
+                        /></label>
+                    </div>
+                </div>
+            </div>
+            <ngx-datatable
+                    #tableRowDetails
+                    (activate)="onActivate($event)"
+                    (select)="onSelect($event)"
+                    [columnMode]="ColumnMode.force"
+                    [footerHeight]="50"
+                    [headerHeight]="40"
+                    [limit]="basicSelectedOption"
+                    [rowHeight]="58"
+                    [rows]="UserRows"
+                    [scrollbarH]="true"
+                    class="bootstrap core-bootstrap"
+            >
+                <ngx-datatable-row-detail [rowHeight]="50">
+                    <ng-template let-expanded="expanded" let-row="row" ngx-datatable-row-detail-template>
+                        <div class="ml-75 pl-5 pt-75">
+                        </div>
+                    </ng-template>
+                </ngx-datatable-row-detail>
+                <ngx-datatable-column
+                        [width]="50"
+                        [resizeable]="false"
+                        [sortable]="false"
+                        [draggable]="false"
+                        [canAutoResize]="false"
+                >
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                        <a
+                                href="javascript:void(0)"
+                                [class.datatable-icon-right]="!expanded"
+                                [class.datatable-icon-down]="expanded"
+                                title="Développer/Réduire la ligne"
+                                (click)="rowDetailsToggleExpand(row)"
+                        >
+                        </a>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Prénom" prop="firstname" ></ngx-datatable-column>
+                <ngx-datatable-column name="Nom" prop="lastname" ></ngx-datatable-column>
+                <ngx-datatable-column name="Email" prop="email" ></ngx-datatable-column>
+                <ngx-datatable-column name="Activé" prop="enabled" >
+                    <ng-template let-status="value" ngx-datatable-cell-template>
+                        <div
+                                [ngClass]="{
+                  'badge-light-warning': status === false,
+                  'badge-light-primary': status === true
+                }"
+                                class="badge badge-pill"
+                        >
+                            {{
+                                status ? "Vrai" : "Faux"
+                            }}
+                        </div>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Rôle" prop="role">
+                    <ng-template let-status="value" ngx-datatable-cell-template>
+                        <div
+                                [ngClass]="{
+                  'badge-light-info': status == 'WORKER',
+                  'badge-light-primary': status == 'MANAGER',
+                  'badge-light-warning': status == 'ADMIN'
+                }"
+                                class="badge badge-pill"
+                        >
+                            {{
+                                status == "WORKER" ? 'TRAVAILLEUR' : status == "MANAGER"
+                                        ? 'MANAGER'
+                                            : status == "ADMIN"
+                                            && 'ADMIN'
+                            }}
+                        </div>
+                    </ng-template>
+                </ngx-datatable-column>
+                 <ngx-datatable-column [sortable]="false" [width]="120" name="Actions" prop="id">
+                    <ng-template let-id="value" ngx-datatable-cell-template>
+                        <div class="d-flex align-items-center">
+                            <div container="body" ngbDropdown>
+                                <a
+                                        aria-expanded="false"
+                                        aria-haspopup="true"
+                                        class="hide-arrow"
+                                        data-toggle="dropdown"
+                                        href="javascript:void(0);"
+                                        id="dropdownBrowserState"
+                                        ngbDropdownToggle
+                                >
+                                    <i class="text-primary cursor-pointer mr-50" data-feather="more-vertical"></i>
+                                </a>
+                                <div aria-labelledby="dropdownBrowserState" class="dropdown-menu-right"
+                                     ngbDropdownMenu>
+                                    <a class="d-flex align-items-center" href="javascript:void(0)" ngbDropdownItem
+                                    ><i class="mr-50" data-feather="file-text"></i> Détails</a
+                                    >
+                                    <a class="d-flex align-items-center" ngbDropdownItem
+                                    ><i class="mr-50" data-feather="archive"></i> Archiver</a
+                                    >
+                                    <a (click)="deleteUser(id)" class="d-flex align-items-center" ngbDropdownItem
+                                    ><i class="mr-50" data-feather="trash-2"></i> Supprimer</a
+                                    >
+                                </div>
+                            </div>
+                            <a (click)="openEditModal(id)">
+                                <i class="text-primary cursor-pointer" data-feather="edit"></i>
+                            </a>
+                        </div>
+                    </ng-template>
+                </ngx-datatable-column>
+            </ngx-datatable>
+        </section>
+        <!--/ Kitchen Sink Datatables -->
+
+    </div>
+</div>
+
+<div *ngIf="showModal" class="modal-backdrop fade show"></div>
+<div *ngIf="showModal" [ngClass]="{'show': showModal}" aria-hidden="!showModal" aria-labelledby="addUserModalLabel"
+     class="modal" role="dialog"
+     style="display: block;" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"
+                    id="addUserModalLabel"> {{ isEditMode ? 'Modifier l\'utilisateur' : 'Ajouter un nouvel utilisateur' }}</h5>
+                <button (click)="toggleModal()" aria-label="Close" class="close" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form (ngSubmit)="isEditMode ? editUser() : addUser()" [formGroup]="UserForm">
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="firstname">Prénom</label>
+                                <input [ngClass]="{'is-invalid': formSubmitted && UserForm.controls['firstname'].invalid}"
+                                       class="form-control" formControlName="firstname"
+                                       id="firstname"
+                                       required type="text"/>
+                                <div *ngIf="formSubmitted && UserForm.controls['firstname'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="lastname">Nom</label>
+                                <input [ngClass]="{'is-invalid': formSubmitted && UserForm.controls['lastname'].invalid}"
+                                       class="form-control" formControlName="lastname"
+                                       id="lastname"
+                                       required type="text"/>
+                                <div *ngIf="formSubmitted && UserForm.controls['lastname'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="password">Mot de passe</label>
+                                <input [ngClass]="{'is-invalid': formSubmitted && UserForm.controls['password'].invalid}"
+                                       class="form-control" formControlName="password"
+                                       id="password"
+                                       required type="password"/>
+                                <div *ngIf="formSubmitted && UserForm.controls['password'].invalid"
+                                     class="invalid-feedback">
+                                    <p *ngIf="UserForm.controls.password.errors.minlength">Le mot de passe doit comporter 8 caractères</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="confirmpassword">Confirmer le mot de passe</label>
+                                <input [ngClass]="{'is-invalid': formSubmitted && UserForm.controls['confirmpassword'].invalid}"
+                                       class="form-control" formControlName="confirmpassword"
+                                       id="confirmpassword"
+                                       required type="password"/>
+                                <div *ngIf="formSubmitted && UserForm.controls['confirmpassword'].invalid"
+                                     class="invalid-feedback">
+                                    <p *ngIf="UserForm.errors?.passwordMismatch">Les mots de passe ne correspondent pas !</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input [ngClass]="{'is-invalid': formSubmitted && UserForm.controls['email'].invalid}"
+                                       class="form-control" formControlName="email"
+                                       id="email"
+                                       required type="email"/>
+                                <div *ngIf="formSubmitted && UserForm.controls['email'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="role">Rôle</label>
+                                <select [ngClass]="{'is-invalid': formSubmitted && UserForm.controls['role'].invalid}"
+                                        class="form-control" formControlName="role" id="role">
+                                    <option value="ADMIN">ADMIN</option>
+                                    <option value="MANAGER">MANAGER</option>
+                                    <option value="WORKER">TRAVAILLEUR</option>
+                                </select>
+                                <div *ngIf="formSubmitted && UserForm.controls['role'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <button class="btn btn-primary" type="submit">{{ isEditMode ? 'Modifier l\'utilisateur' : 'Ajouter un utilisateur' }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

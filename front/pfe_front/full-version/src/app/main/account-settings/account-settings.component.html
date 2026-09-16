@@ -1,0 +1,176 @@
+<div class="content-wrapper container-xxl p-0">
+  <div class="content-body">
+    <!-- content-header component -->
+    <app-content-header [contentHeader]="contentHeader"></app-content-header>
+
+    <!-- page de paramètres du compte -->
+    <section id="page-account-settings">
+      <div class="row nav-vertical d-flex">
+        <div class="col-md-3 mb-2 mb-md-0">
+          <ul ngbNav #navVertical="ngbNav" class="nav nav-pills flex-column nav-left">
+            <li class="nav-item" ngbNavItem>
+              <a
+                ngbNavLink
+                class="nav-link d-flex py-75"
+                id="account-pill-general"
+                data-toggle="pill"
+                href="#account-vertical-general"
+                aria-expanded="true"
+              >
+                <i data-feather="user" class="font-medium-3 mr-1"></i>
+                <span class="font-weight-bold">Général</span>
+              </a>
+              <ng-template ngbNavContent>
+                <div class="card">
+                  <div class="card-body">
+
+                    <!-- formulaire -->
+                    <form (ngSubmit)="updateGeneralInfo()" class="validate-form mt-2">
+                      <div class="row">
+                        <div class="col-12 col-sm-6">
+                          <div class="form-group">
+                            <label for="account-username">Prénom</label>
+                            <input
+                              type="text"
+                              [(ngModel)]="data.firstname"
+                              class="form-control"
+                              id="account-username"
+                              name="username"
+                              placeholder="Prénom"
+                            />
+                          </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                          <div class="form-group">
+                            <label for="account-name">Nom</label>
+                            <input
+                              type="text"
+                              [(ngModel)]="data.lastname"
+                              class="form-control"
+                              id="account-name"
+                              name="lastname"
+                              placeholder="Nom"
+                            />
+                          </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                          <div class="form-group">
+                            <label for="account-e-mail">E-mail</label>
+                            <input
+                              type="email"
+                              [(ngModel)]="data.email"
+                              class="form-control"
+                              id="account-e-mail"
+                              name="email"
+                              placeholder="E-mail"
+                            />
+                          </div>
+                        </div>
+                        <div class="col-12">
+                          <button type="submit" class="btn btn-primary mt-2 mr-1" rippleEffect>Enregistrer les modifications</button>
+                        </div>
+                      </div>
+                    </form>
+                    <!--/ formulaire -->
+                  </div>
+                </div>
+              </ng-template>
+            </li>
+            <li class="nav-item" ngbNavItem>
+              <a
+                ngbNavLink
+                class="nav-link d-flex py-75"
+                id="account-pill-password"
+                data-toggle="pill"
+                href="#account-vertical-password"
+                aria-expanded="false"
+              >
+                <i data-feather="lock" class="font-medium-3 mr-1"></i>
+                <span class="font-weight-bold">Changer le mot de passe</span>
+              </a>
+              <ng-template ngbNavContent>
+                <div class="card">
+                  <div class="card-body">
+                    <!-- formulaire -->
+                      <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()" class="validate-form">
+                          <div class="row">
+                              <div class="col-12 col-sm-6">
+                                  <div class="form-group">
+                                      <label for="account-new-password">Nouveau mot de passe</label>
+                                      <div class="input-group form-password-toggle input-group-merge">
+                                          <input
+                                                  [type]="passwordTextTypeNew ? 'text' : 'password'"
+                                                  id="account-new-password"
+                                                  formControlName="newPassword"
+                                                  class="form-control"
+                                                  placeholder="Nouveau mot de passe"
+                                          />
+                                          <div class="input-group-append">
+            <span class="input-group-text cursor-pointer">
+              <i
+                      class="feather font-small-4"
+                      [ngClass]="{
+                  'icon-eye-off': passwordTextTypeNew,
+                  'icon-eye': !passwordTextTypeNew
+                }"
+                      (click)="togglePasswordTextTypeNew()"
+              ></i>
+            </span>
+                                          </div>
+                                      </div>
+                                      <div *ngIf="passwordForm.get('newPassword').touched && passwordForm.get('newPassword').invalid" class="text-danger">
+                                          Le nouveau mot de passe doit comporter au moins 8 caractères
+                                      </div>
+                                  </div>
+                              </div>
+
+                              <div class="col-12 col-sm-6">
+                                  <div class="form-group">
+                                      <label for="account-retype-new-password">Retaper le nouveau mot de passe</label>
+                                      <div class="input-group form-password-toggle input-group-merge">
+                                          <input
+                                                  [type]="passwordTextTypeRetype ? 'text' : 'password'"
+                                                  class="form-control"
+                                                  id="account-retype-new-password"
+                                                  formControlName="confirmPassword"
+                                                  placeholder="Retaper le nouveau mot de passe"
+                                          />
+                                          <div class="input-group-append">
+            <span class="input-group-text cursor-pointer">
+              <i
+                      class="feather font-small-4"
+                      [ngClass]="{
+                  'icon-eye-off': confPasswordTextType,
+                  'icon-eye': !confPasswordTextType
+                }"
+                      (click)="togglePasswordTextTypeRetype()"
+              ></i>
+            </span>
+                                          </div>
+                                      </div>
+                                      <div *ngIf="passwordForm.hasError('passwordMismatch') && passwordForm.get('confirmPassword').touched" class="text-danger">
+                                          Les mots de passe ne correspondent pas.
+                                      </div>
+                                  </div>
+                              </div>
+
+                              <div class="col-12">
+                                  <button type="submit" class="btn btn-primary mr-1 mt-1" rippleEffect [disabled]="passwordForm.invalid">
+                                      Enregistrer les modifications
+                                  </button>
+                              </div>
+                          </div>
+                      </form>
+                    <!--/ formulaire -->
+                  </div>
+                </div>
+              </ng-template>
+            </li>
+          </ul>
+        </div>
+        <div [ngbNavOutlet]="navVertical" class="col-12 col-md-9"></div>
+      </div>
+    </section>
+    <!--/ page de paramètres du compte -->
+  </div>
+</div>

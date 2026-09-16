@@ -1,0 +1,133 @@
+<div class="content-wrapper container-xxl p-0">
+    <div class="content-body">
+        <section class="invoice-preview-wrapper">
+            <div class="row invoice-preview">
+                <!-- Facture -->
+                <div class="col-xl-9 col-md-8 col-12 printRef">
+                    <div class="card invoice-preview-card">
+                        <div class="card-body invoice-padding pb-0">
+                            <!-- Début de l'en-tête -->
+                            <div class="d-flex justify-content-between flex-md-row flex-column invoice-spacing mt-0">
+                                <div>
+                                    <h1 class="card-text mb-50">{{problem.description}}</h1>
+                                    <h6 class="mb-25">Émis par</h6>
+                                    <p class="card-text mb-25">{{ problem.user.firstname }} {{ problem.user.lastname }}</p>
+                                </div>
+                                <div class="mt-md-0 mt-2">
+                                    <h4 class="invoice-title">
+                                        Problème
+                                        <span class="invoice-number">#{{problem.id}}</span>
+                                    </h4>
+                                    <div class="invoice-date-wrapper">
+                                        <p class="invoice-date-title">Date d’émission :</p>
+                                        <p class="invoice-date">{{formatDate(problem.dateCreation)}}</p>
+                                    </div>
+                                    <div class="invoice-date-wrapper">
+                                        <p class="invoice-date-title">Date limite :</p>
+                                        <p class="invoice-date">{{formatDate(problem.dateResolution)}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Fin de l'en-tête -->
+                        </div>
+
+                        <hr class="invoice-spacing" />
+
+                        <!-- Début de l'adresse et du contact -->
+                        <div class="card-body invoice-padding pt-0">
+                            <div class="row invoice-spacing">
+                                <div class="col-xl-8 p-0">
+                                    <h6 class="mb-2">Affecté à :</h6>
+                                    <div class="mb-1" *ngFor="let user of problem.affectedUsers">
+                                        <h6 class="mb-25">{{ user.firstname }} {{ user.lastname }}</h6>
+                                        <p class="card-text mb-25">{{ user.email }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 p-0 mt-xl-0 mt-2">
+                                    <h6 class="mb-2">Statut</h6>
+                                    <table>
+                                        <tbody>
+                                        <tr>
+                                            <td class="pr-1">Statut</td>
+                                            <td>
+                                                <span class="font-weight-bold">{{ problem.statutProbleme }}</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="pr-1">Priorité</td>
+                                            <td>{{ problem.priorite }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="pr-1">Impact</td>
+                                            <td>{{ problem.impact }}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Fin de l'adresse et du contact -->
+
+                        <!-- Début de la description du problème -->
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th class="py-1">Informations supplémentaires</th>
+                                    <th class="py-1"></th>
+                                    <th class="py-1"></th>
+                                    <th class="py-1"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="card-body invoice-padding pb-0">
+                            <div class="row invoice-sales-total-wrapper">
+                                <div class="col-md-6 order-md-1 order-2 mt-md-0 mt-3">
+                                    <p class="card-text mb-0">
+                                        <span class="font-weight-bold">Fichiers ajoutés</span> <span class="ml-75"></span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 d-flex justify-content-end order-md-2 order-1">
+                                    <div class="invoice-total-wrapper">
+                                        <a (click)="downloadFile(problem.encodedfilename)">{{problem.filename}}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Fin de la description du problème -->
+
+                        <hr class="invoice-spacing" />
+
+                        <!-- Début de la note -->
+                        <div class="card-body invoice-padding pt-0">
+                            <div class="row">
+                                <div class="col-12">
+                                    <span class="font-weight-bold">Note :</span>
+                                    <span>Cette information est confidentielle !</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Fin de la note -->
+                    </div>
+                </div>
+                <!--/ Facture -->
+
+                <!-- Actions sur la facture -->
+                <div class="col-xl-3 col-md-4 col-12 invoice-actions mt-md-0 mt-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <a class="btn btn-outline-secondary btn-block mb-75" href="javascript:window.print();" rippleEffect>
+                                Imprimer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!--/ Actions sur la facture -->
+            </div>
+        </section>
+    </div>
+</div>

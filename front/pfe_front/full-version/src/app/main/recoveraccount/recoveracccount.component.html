@@ -1,0 +1,123 @@
+<div class="auth-wrapper auth-v1 px-2">
+  <div class="auth-inner py-2">
+    <!-- Mot de passe oublié v1 -->
+    <div class="card mb-0">
+      <div class="card-body">
+        <a href="javascript:void(0);" class="brand-logo">
+          <img src="{{ coreConfig.app.appLogoImage }}" alt="brand-logo" height="120" />
+          <h2 class="brand-text text-primary ml-1">{{ coreConfig.app.appName }}</h2>
+        </a>
+
+        <h4 class="card-title mb-1">Récupérez votre compte 🔒</h4>
+        <p class="card-text mb-2">Entrez votre code de récupération ci-dessous pour réinitialiser votre mot de passe</p>
+
+          <div *ngIf="!codeError.valid" class="max-w-sm mx-auto">
+              <div class="d-flex mb-3" style="gap: 10px">
+                  <div *ngFor="let code of codes; let i = index">
+                      <input
+                              type="text"
+                              maxlength="1"
+                              id="code-{{ i }}"
+                              class="form-control text-center fw-bold"
+                              [(ngModel)]="codes[i]"
+                              [attr.data-focus-input-prev]="i > 0 ? 'code-' + (i - 1) : null"
+                              [attr.data-focus-input-next]="i < codes.length - 1 ? 'code-' + (i + 1) : null"
+                              (keyup)="focusNextInput($event, i)"
+                              (paste)="handlePaste($event)"
+                              required
+                      />
+                  </div>
+              </div>
+              <p *ngIf="codeError.state" id="helper-text-explanation" class="form-text" style="color: red;">{{codeError.message}}</p>
+              <button (click)="onSubmit()" class="btn btn-primary btn-block" tabindex="2" rippleEffect>Activer</button>
+          </div>
+
+          <form *ngIf="codeError.valid" class="auth-reset-password-form mt-2" [formGroup]="PasswordForm" (ngSubmit)="ChangePassword()">
+              <div class="form-group">
+                  <div class="d-flex justify-content-between">
+                      <label for="password">Nouveau mot de passe</label>
+                  </div>
+                  <div class="input-group input-group-merge form-password-toggle">
+                      <input
+                              [type]="passwordTextType ? 'text' : 'password'"
+                              formControlName="password"
+                              class="form-control form-control-merge"
+                              placeholder="············"
+                              aria-describedby="reset-password-new"
+                              tabindex="1"
+                              autofocus
+                              required
+                              id="password"
+                              [ngClass]="{ 'is-invalid error': submitted && PasswordForm.controls['password'].invalid }"
+                      />
+                      <div class="input-group-append">
+                <span class="input-group-text cursor-pointer"
+                ><i
+                        class="feather font-small-4"
+                        [ngClass]="{
+                      'icon-eye-off': passwordTextType,
+                      'icon-eye': !passwordTextType
+                    }"
+                        (click)="togglePasswordTextType()"
+                ></i
+                ></span>
+                      </div>
+                  </div>
+                  <div
+                          *ngIf="submitted && PasswordForm.controls['password'].invalid"
+                          class="invalid-feedback"
+                          [ngClass]="{ 'd-block': submitted && PasswordForm.controls['password'].invalid }"
+                  >
+                      <div *ngIf="PasswordForm.controls.password.errors.minlength">Le mot de passe doit comporter au moins 8 caractères</div>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <div class="d-flex justify-content-between">
+                      <label for="confirmpassword">Confirmer le mot de passe</label>
+                  </div>
+                  <div class="input-group input-group-merge form-password-toggle">
+                      <input
+                              [type]="confPasswordTextType ? 'text' : 'password'"
+                              formControlName="confirmpassword"
+                              class="form-control form-control-merge"
+                              placeholder="············"
+                              aria-describedby="reset-password-confirm"
+                              tabindex="2"
+                              required
+                              id="confirmpassword"
+                              [ngClass]="{ 'is-invalid error': submitted && PasswordForm.controls['confirmpassword'].invalid }"
+                      />
+                      <div class="input-group-append">
+                <span class="input-group-text cursor-pointer"
+                ><i
+                        class="feather font-small-4"
+                        [ngClass]="{
+                      'icon-eye-off': confPasswordTextType,
+                      'icon-eye': !confPasswordTextType
+                    }"
+                        (click)="toggleConfPasswordTextType()"
+                ></i
+                ></span>
+                      </div>
+                  </div>
+                  <div
+                          *ngIf="submitted && PasswordForm.controls['confirmpassword'].invalid"
+                          class="invalid-feedback"
+                          [ngClass]="{ 'd-block': submitted && PasswordForm.controls['confirmpassword'].invalid }"
+                  >
+                      <div *ngIf="PasswordForm.errors?.passwordMismatch">Les mots de passe ne correspondent pas</div>
+                  </div>
+              </div>
+              <button class="btn btn-primary btn-block" type="submit" tabindex="3" rippleEffect>Définir un nouveau mot de passe</button>
+          </form>
+
+          <p class="text-center mt-2">
+          <a routerLink="/login">
+            <i data-feather="chevron-left" class="mb-25"></i> Retour à la connexion
+          </a>
+        </p>
+      </div>
+    </div>
+    <!-- /Mot de passe oublié v1 -->
+  </div>
+</div>

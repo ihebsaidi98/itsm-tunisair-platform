@@ -1,0 +1,5 @@
+export enum EvenementIncident {
+  DECLARER = "DECLARER",
+  COMMENCER_TRAVAIL = "COMMENCER_TRAVAIL",
+  RESOUDRE = "RESOUDRE"
+}

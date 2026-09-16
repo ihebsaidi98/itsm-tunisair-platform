@@ -1,0 +1,390 @@
+<div class="content-wrapper container-xxl p-0">
+    <div class="content-body">
+
+
+        <!-- Kitchen Sink Datatables -->
+        <section id="ngx-datatable-kitchen-sink" style="background: white; padding: 20px; border-radius: 10px">
+            <h4 class="card-title">Problèmes</h4>
+            <div class="row">
+                <div class="col-12 mb-50">
+                    <a [data]="exportCSVData" class="btn btn-outline-secondary float-right mr-1" csvLink
+                       rippleEffect
+                    >Exporter CSV</a>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="d-flex justify-content-between align-items-center m-1">
+                        <label class="d-flex align-items-center">
+                            Afficher
+                            <select [(ngModel)]="basicSelectedOption" class="form-control mx-25">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            entrées
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6 col-12 d-flex justify-content-md-end">
+                    <div class="d-flex align-items-center justify-content-end pr-1 pb-1 pl-1 pl-md-0 pb-md-0">
+                        <label class="d-flex align-items-center">
+                            Rechercher
+                            <input
+                                    (keyup)="filterUpdate($event)"
+                                    (search)="filterUpdate($event)"
+                                    class="form-control ml-25"
+                                    placeholder="Rechercher"
+                                    type="search"
+                            />
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <ngx-datatable
+                #tableRowDetails
+                (activate)="onActivate($event)"
+                (select)="onSelect($event)"
+                [columnMode]="ColumnMode.force"
+                [footerHeight]="50"
+                [headerHeight]="40"
+                [limit]="basicSelectedOption"
+                [rowHeight]="80"
+                [rows]="ProblemRows"
+                [scrollbarH]="true"
+                class="bootstrap core-bootstrap"
+            >
+                <ngx-datatable-row-detail [rowHeight]="50">
+                    <ng-template let-expanded="expanded" let-row="row" ngx-datatable-row-detail-template>
+                        <div class="ml-75 pl-5 pt-75">
+                            <div>
+                                <span style="margin-right: 10px;"><strong>Date de soumission : </strong>{{ formatDate(row.dateCreation) }} </span>
+                                <span><strong>Impact : </strong> {{ row.impact }}</span>
+                            </div>
+                        </div>
+                    </ng-template>
+                </ngx-datatable-row-detail>
+                <ngx-datatable-column
+                        [canAutoResize]="false"
+                        [draggable]="false"
+                        [resizeable]="false"
+                        [sortable]="false"
+                        [width]="50"
+                >
+                    <ng-template let-expanded="expanded" let-row="row" ngx-datatable-cell-template>
+                        <a
+                                (click)="rowDetailsToggleExpand(row)"
+                                [class.datatable-icon-down]="expanded"
+                                [class.datatable-icon-right]="!expanded"
+                                href="javascript:void(0)"
+                                title="Développer/Réduire la ligne"
+                        >
+                        </a>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="170" name="Soumis par" prop="user">
+                    <ng-template let-user="value" ngx-datatable-cell-template>
+                        <div class="cell-line-height">
+                            <p class="font-medium-1 line-height-1 mb-0"> {{ user.firstname }} {{ user.lastname }}</p>
+                            <span class="text-muted font-small-2">  {{ user.email }}</span>
+                        </div>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Description" prop="description"></ngx-datatable-column>
+                <ngx-datatable-column *ngIf="!isClient" [sortable]="false" [width]="210" name="Affecté à" prop="affectedUsers">
+                    <ng-template let-affectedUsers="value" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                        <ng-select (change)="affectpeople(rowIndex,$event)" [multiple]="true" [(ngModel)]="AffectedUsers[rowIndex]">
+                            <ng-option [id]="2" *ngFor="let user of users" [value]="user.id">{{user.firstname}}</ng-option>
+                        </ng-select>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Date de résolution" prop="dateResolution">
+                    <ng-template let-date="value" ngx-datatable-cell-template>
+                        {{ formatDate(date) }}
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Priorité" prop="priorite">
+                    <ng-template let-status="value" ngx-datatable-cell-template>
+                        <div
+                                [ngClass]="{
+                        'badge-light-info': status == 'FAIBLE',
+                        'badge-light-primary': status == 'MOYENNE',
+                        'badge-light-danger': status == 'URGENTE',
+                        'badge-light-warning': status == 'HAUTE'
+                    }"
+                                class="badge badge-pill"
+                        >
+                            {{
+                                status == "FAIBLE" ? 'FAIBLE' : status == "MOYENNE"
+                                    ? 'MOYENNE'
+                                    : status == "URGENTE"
+                                        ? 'URGENTE'
+                                        : status == "HAUTE"
+                                        && 'HAUTE'
+                            }}
+                        </div>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Statut" prop="statutProbleme">
+                    <ng-template let-status="value" ngx-datatable-cell-template>
+                        <div
+                                [ngClass]="{
+                        'badge-light-primary': status == 'EN_COURS_RESOLUTION',
+                        'badge-light-danger': status == 'NOUVEAU',
+                        'badge-light-info': status == 'EN_COURS_ENQUETE',
+                        'badge-light-warning': status == 'EN_ATTENTE_EVALUATION',
+                        'badge-light-success': status == 'RESOLU'
+                    }"
+                                class="badge badge-pill"
+                        >
+                            {{
+                                status == "NOUVEAU" ? 'NOUVEAU' :
+                                    status == "RESOLU" ? 'RESOLU' :
+                                        status == "EN_ATTENTE_EVALUATION" ? 'EN ATTENTE ÉVALUATION' :
+                                            status == "EN_COURS_ENQUETE" ? 'EN COURS ENQUÊTE' :
+                                                status == "EN_COURS_RESOLUTION" && 'EN COURS RÉSOLUTION'
+                            }}
+                        </div>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="250" name="Fichier (Cliquez pour télécharger)" prop="filename">
+                    <ng-template let-filename="value" ngx-datatable-cell-template>
+                        <a (click)="downloadFile(filename)">{{ filename }}</a>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [sortable]="false" [width]="120" name="Actions" prop="id">
+                    <ng-template let-id="value" ngx-datatable-cell-template>
+                        <div class="d-flex align-items-center">
+                            <div container="body" ngbDropdown>
+                                <a
+                                        aria-expanded="false"
+                                        aria-haspopup="true"
+                                        class="hide-arrow"
+                                        data-toggle="dropdown"
+                                        href="javascript:void(0);"
+                                        id="dropdownBrowserState"
+                                        ngbDropdownToggle
+                                >
+                                    <i class="text-primary cursor-pointer mr-50" data-feather="more-vertical"></i>
+                                </a>
+                                <div aria-labelledby="dropdownBrowserState" class="dropdown-menu-right" ngbDropdownMenu>
+                                    <a href="http://localhost:4200/probleme/{{id}}" class="d-flex align-items-center" ngbDropdownItem>
+                                        <i class="mr-50" data-feather="file-text"></i> Détails
+                                    </a>
+                                    <a (click)="archiveProblem(id)" class="d-flex align-items-center" ngbDropdownItem>
+                                        <i class="mr-50" data-feather="archive"></i> Désarchiver
+                                    </a>
+                                    <a (click)="deleteProbleme(id)" class="d-flex align-items-center" ngbDropdownItem>
+                                        <i class="mr-50" data-feather="trash-2"></i> Supprimer
+                                    </a>
+                                </div>
+                            </div>
+                            <a (click)="ToggleaskAi(id)">
+                                <i class="text-primary cursor-pointer" data-feather="help-circle"></i>
+                            </a>
+                        </div>
+                    </ng-template>
+                </ngx-datatable-column>
+            </ngx-datatable>
+        </section>
+
+        <!--/ Kitchen Sink Datatables -->
+
+
+    </div>
+</div>
+
+<div *ngIf="showModal|| showAiModal" class="modal-backdrop fade show"></div>
+<div *ngIf="showModal" [ngClass]="{'show': showModal}" aria-hidden="!showModal" aria-labelledby="addProblemeModalLabel"
+     class="modal" role="dialog"
+     style="display: block;" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"
+                    id="addProblemeModalLabel"> {{ isEditMode ? 'Modifier le Problème' : 'Ajouter un Nouveau Problème' }}</h5>
+                <button (click)="toggleModal()" aria-label="Fermer" class="close" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form (ngSubmit)="isEditMode ? editProbleme() : addProbleme()" [formGroup]="ProblemeForm">
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="impact">Impact</label>
+                                <input [ngClass]="{'is-invalid': formSubmitted && ProblemeForm.controls['impact'].invalid}"
+                                       class="form-control" formControlName="impact"
+                                       id="impact"
+                                       required type="text"/>
+                                <div *ngIf="formSubmitted && ProblemeForm.controls['impact'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="dateResolution">Date de Résolution</label>
+                                <input [ngClass]="{'is-invalid': formSubmitted && ProblemeForm.controls['dateResolution'].invalid}"
+                                       class="form-control"
+                                       formControlName="dateResolution"
+                                       id="dateResolution" required type="date"/>
+                                <div *ngIf="formSubmitted && ProblemeForm.controls['dateResolution'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <textarea
+                                        [ngClass]="{'is-invalid': formSubmitted && ProblemeForm.controls['description'].invalid}"
+                                        class="form-control"
+                                        formControlName="description" id="description" required></textarea>
+                                <div *ngIf="formSubmitted && ProblemeForm.controls['description'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="priorite">Priorité</label>
+                                <select [ngClass]="{'is-invalid': formSubmitted && ProblemeForm.controls['priorite'].invalid}"
+                                        class="form-control" formControlName="priorite" id="priorite">
+                                    <option value="FAIBLE">Faible</option>
+                                    <option value="MOYENNE">Moyenne</option>
+                                    <option value="HAUTE">Haute</option>
+                                    <option value="URGENTE">Urgente</option>
+                                </select>
+                                <div *ngIf="formSubmitted && ProblemeForm.controls['priorite'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="statutProbleme">Statut</label>
+                                <select [ngClass]="{'is-invalid': formSubmitted && ProblemeForm.controls['statutProbleme'].invalid}"
+                                        class="form-control" formControlName="statutProbleme" id="statutProbleme">
+                                    <option *ngIf="isEditMode === true" value="RESOLU">Résolu</option>
+                                    <option value="NOUVEAU">Nouveau</option>
+                                    <option value="EN_ATTENTE_EVALUATION">En Attente d'Évaluation</option>
+                                    <option value="EN_COURS_ENQUETE">En Cours d'Enquête</option>
+                                    <option value="EN_COURS_RESOLUTION">En Cours de Résolution</option>
+                                </select>
+                                <div *ngIf="formSubmitted && ProblemeForm.controls['statutProbleme'].invalid"
+                                     class="invalid-feedback">Ce champ est requis !
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Fichier</label>
+                                <div class="custom-file">
+                                    <input (change)="onFileSelected($event)" class="custom-file-input" id="customFile"
+                                           type="file"/>
+                                    <label class="custom-file-label" for="customFile">Choisir un fichier</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Notifier les Personnes</label>
+                                <ng-select (change)="NotifyPeople($event)" [multiple]="true"  [(ngModel)]="NotifiedUsers">
+                                    <ng-option [id]="2" *ngFor="let user of users" [value]="user.id">{{user.firstname}}</ng-option>
+                                </ng-select>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                    <button class="btn btn-primary" type="submit">{{ isEditMode ? 'Modifier le Problème' : 'Ajouter le Problème' }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="showAiModal" [ngClass]="{'show': showAiModal}" aria-hidden="true" aria-labelledby="AskAI"
+     class="modal" role="dialog"
+     style="display: block;" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"
+                    id="showAiModel">Demander à l'IA</h5>
+                <button (click)="ToggleAiModal()" aria-label="Fermer" class="close" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h5 *ngIf="!hasPDFfile">Ce changement n'a pas de fichier PDF ! </h5>
+                <section *ngIf="hasPDFfile" class="chat-app-window">
+                    <div class="start-chat-area d-none">
+                        <div class="mb-1 start-chat-icon">
+                            <i data-feather="message-square"></i>
+                        </div>
+                    </div>
+                    <div #scrollMe  class="user-chats" [scrollTop]="scrolltop">
+                        <div class="chats">
+                            <div class="chats">
+                                <div
+                                        class="chat"
+                                        *ngFor="let chatRef of chats.chat"
+                                        [ngClass]="{ 'chat-left': 0 === chatRef.userId }"
+                                >
+                                    <div class="chat-avatar">
+            <span class="avatar box-shadow-1 cursor-pointer">
+              <img
+                      *ngIf="chatRef.userId !== 0; else alternateAvatar"
+                      src="../assets/images/ai.png"
+                      alt="avatar"
+                      height="36"
+                      width="36"
+              />
+              <ng-template #alternateAvatar>
+                <img src="../assets/images/ai.png" alt="avatar" height="36" width="36" />
+              </ng-template>
+            </span>
+                                    </div>
+                                    <div class="chat-body">
+                                        <div class="chat-content">
+                                            <p>{{ chatRef.message }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <form class="chat-app-form" action="javascript:void(0);">
+                        <div class="input-group input-group-merge mr-1 form-send-message">
+                            <input
+                                    type="text"
+                                    class="form-control message"
+                                    placeholder="Tapez votre message ou utilisez la reconnaissance vocale"
+                                    [(ngModel)]="chatMessage"
+                                    name="chat-message"
+                                    (keydown.enter)="updateChat()"
+                            />
+                        </div>
+                        <button type="button" class="btn btn-primary send" (click)="updateChat()" rippleEffect>
+                            <i data-feather="send" class="d-lg-none"></i>
+                            <span class="d-none d-lg-block">Envoyer</span>
+                        </button>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
